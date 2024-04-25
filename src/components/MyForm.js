@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 import {
   Formik,
   Form,
@@ -6,7 +8,7 @@ import {
   FieldArray,
   FastField,
 } from "formik";
-import React from "react";
+
 import * as Yup from "yup";
 import TextError from "./TextError";
 
@@ -24,10 +26,27 @@ const initialValues = {
   phNumbers: [""],
 };
 
+const savedValues = {
+  name: "Devesh",
+  email: "devesh@example.com",
+  channel: "kiwitech",
+  comments: "welcome to Formik",
+  address: "B-9 Noida",
+  social: {
+    facebook: "",
+    twitter: "",
+  },
+  phoneNumbers: ["", ""],
+  phNumbers: [""],
+};
+
 // const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
 
-const onSubmit = (values) => {
+const onSubmit = (values, onSubmitProps) => {
   console.log("Form data", values);
+  console.log("submit props", onSubmitProps);
+  onSubmitProps.setSubmitting(false);
+  onSubmitProps.resetForm();
 };
 
 const validationSchema = Yup.object({
@@ -45,11 +64,14 @@ const validateComments = (value) => {
 };
 
 function MyForm() {
+  const [formValues, setFormValues] = useState(null);
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={formValues || initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
+      enableReinitialize
+      // validateOnMount
       // validateOnChange={false}
       // validateOnBlur={false}
     >
@@ -184,7 +206,19 @@ function MyForm() {
             >
               Visit fields
             </button> */}
-            <button type="submit">Submit</button>
+
+            <button type="button" onClick={() => setFormValues(savedValues)}>
+              Load saved data
+            </button>
+
+            <button type="reset">Reset</button>
+
+            <button
+              type="submit"
+              disabled={!formik.isValid || formik.isSubmitting}
+            >
+              Submit
+            </button>
           </Form>
         );
       }}
